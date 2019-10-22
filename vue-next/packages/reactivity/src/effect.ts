@@ -45,10 +45,13 @@ export function effect<T = any>(
   fn: () => T,
   options: ReactiveEffectOptions = EMPTY_OBJ
 ): ReactiveEffect<T> {
+ // 检测是否 effect 方法，如果是的话，则取raw上面保存的原始方法
   if (isEffect(fn)) {
     fn = fn.raw
   }
+  // 封装响应依赖函数
   const effect = createReactiveEffect(fn, options)
+  // 如果不是 惰性 依赖的话，则立刻触发
   if (!options.lazy) {
     effect()
   }
@@ -65,6 +68,7 @@ export function stop(effect: ReactiveEffect) {
   }
 }
 
+// 封装响应依赖函数
 function createReactiveEffect<T = any>(
   fn: () => T,
   options: ReactiveEffectOptions
@@ -92,8 +96,10 @@ function run(effect: ReactiveEffect, fn: Function, args: any[]): any {
     cleanup(effect)
     try {
       effectStack.push(effect)
+      // 直接return函数的话，就不用catch了
       return fn(...args)
     } finally {
+      // 执行完毕都会推出当前依赖函数
       effectStack.pop()
     }
   }
@@ -131,18 +137,23 @@ export function track(
   if (type === OperationTypes.ITERATE) {
     key = ITERATE_KEY
   }
+  // 取得该目标的依赖Map，在reactive函数中会首先保存该目标，详见 ./reactive.ts中的createReactiveObject函数
   let depsMap = targetMap.get(target)
-  // 如果没有该目标的依赖，则新建一个以该目标为key的依赖
+  // 存储当前对象 值的依赖Map集合
   if (depsMap === void 0) {
     targetMap.set(target, (depsMap = new Map()))
   }
+  // 再根据key来取得对应的依赖
   let dep = depsMap.get(key!)
   if (dep === void 0) {
     depsMap.set(key!, (dep = new Set()))
   }
+  // 检查是否有重复的 effect
   if (!dep.has(effect)) {
     dep.add(effect)
+    // TODO: 该effect又需要推入新的一轮依赖Set集合
     effect.deps.push(dep)
+    // 开发环境 需要打点情况下，effect需要进行记录
     if (__DEV__ && effect.onTrack) {
       effect.onTrack({
         effect,

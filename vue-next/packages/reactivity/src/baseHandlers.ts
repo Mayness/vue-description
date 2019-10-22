@@ -13,8 +13,9 @@ const builtInSymbols = new Set(
 
 function createGetter(isReadonly: boolean) {
   return function get(target: any, key: string | symbol, receiver: any) {
+    // debugger;
     const res = Reflect.get(target, key, receiver)
-    // key 不能为symbol类型，并且对象内部部署的symbol接口也不进行侦听
+    // key 不能为symbol类型，并且对象内部部署的symbol接口也不进行侦听 (因为symbol扩展的属性一般是内置属性，例如toString()、valueOf()等 )；
     if (isSymbol(key) && builtInSymbols.has(key)) {
       return res
     }

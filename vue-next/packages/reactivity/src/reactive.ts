@@ -1,4 +1,5 @@
 import { isObject, toTypeString } from '@vue/shared'
+
 import { mutableHandlers, readonlyHandlers } from './baseHandlers'
 import {
   mutableCollectionHandlers,
@@ -14,6 +15,13 @@ import { makeMap } from '@vue/shared'
 // raw Sets to reduce memory overhead.
 export type Dep = Set<ReactiveEffect>
 export type KeyToDepMap = Map<string | symbol, Dep>
+/*
+  targetMap = WeakMap{
+    targetObject: Set{
+      ReactiveEffect      // ReactiveEffect类见 ./effect.ts 中的 ReactiveEffect 接口
+    }
+  }
+*/
 export const targetMap = new WeakMap<any, KeyToDepMap>()
 
 // 通过原始数据 查找 响应数据
@@ -89,30 +97,40 @@ function createReactiveObject(
   baseHandlers: ProxyHandler<any>,
   collectionHandlers: ProxyHandler<any>
 ) {
+  // 被观测的目标必须是对象，因为proxy只能观测对象
   if (!isObject(target)) {
     if (__DEV__) {
       console.warn(`value cannot be made reactive: ${String(target)}`)
     }
     return target
   }
-  // target already has corresponding Proxy
+  // 目标已经是个映射的 响应数据 的原始数据 的话，则直接返回 响应数据
   let observed = toProxy.get(target)
   if (observed !== void 0) {
     return observed
   }
-  // target is already a Proxy
+  // 目标如果是个 可响应数据 则直接返回
   if (toRaw.has(target)) {
     return target
   }
-  // only a whitelist of value types can be observed.
+  // 只有在白名单的目标才能被监听，白名单包括：
+  /* canObserve函数
+    1, 不是vue内置数据
+    2，不是虚拟dom
+    3，'Object', 'Array', 'Map', 'Set', 'WeakMap', 'WeakSet' 中的类型
+    4，由nonReactiveValues用户配置的不可监听的值
+  */
   if (!canObserve(target)) {
     return target
   }
+  // 又对象的构造函数类型来决定proxy到底使用哪种handler，默认是 baseHandlers，如果是集合则用collectionHandlers
   const handlers = collectionTypes.has(target.constructor)
     ? collectionHandlers
     : baseHandlers
   observed = new Proxy(target, handlers)
+  // 备份 原始数据 -> 响应数据
   toProxy.set(target, observed)
+  // 备份 响应数据 -> 原始数据
   toRaw.set(observed, target)
   if (!targetMap.has(target)) {
     targetMap.set(target, new Map())
@@ -136,7 +154,7 @@ export function markReadonly<T>(value: T): T {
   readonlyValues.add(value)
   return value
 }
-
+// 配置决定不能监听的值
 export function markNonReactive<T>(value: T): T {
   nonReactiveValues.add(value)
   return value
