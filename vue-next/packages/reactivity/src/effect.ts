@@ -2,8 +2,10 @@ import { OperationTypes } from './operations'
 import { Dep, targetMap } from './reactive'
 import { EMPTY_OBJ, extend } from '@vue/shared'
 
+// 为响应函数进行标记
 export const effectSymbol = Symbol(__DEV__ ? 'effect' : void 0)
 
+// 封装依赖函数：ReactiveEffect
 export interface ReactiveEffect<T = any> {
   (): T
   [effectSymbol]: true
@@ -16,7 +18,7 @@ export interface ReactiveEffect<T = any> {
   onTrigger?: (event: DebuggerEvent) => void
   onStop?: () => void
 }
-
+// 封装依赖函数的一些属性
 export interface ReactiveEffectOptions {
   lazy?: boolean
   computed?: boolean
@@ -26,6 +28,7 @@ export interface ReactiveEffectOptions {
   onStop?: () => void
 }
 
+// 用于调试模式下用到的一些属性
 export interface DebuggerEvent {
   effect: ReactiveEffect
   target: any
@@ -33,10 +36,12 @@ export interface DebuggerEvent {
   key: string | symbol | undefined
 }
 
+// ReactiveEffect堆栈
 export const effectStack: ReactiveEffect[] = []
 
 export const ITERATE_KEY = Symbol('iterate')
 
+// 判断函数是否 已经经过createReactiveEffect函数封装
 export function isEffect(fn: any): fn is ReactiveEffect {
   return fn != null && fn[effectSymbol] === true
 }
@@ -87,8 +92,9 @@ function createReactiveEffect<T = any>(
   effect.deps = []
   return effect
 }
-
+// TODO:
 function run(effect: ReactiveEffect, fn: Function, args: any[]): any {
+  // debugger;
   if (!effect.active) {
     return fn(...args)
   }
@@ -104,7 +110,7 @@ function run(effect: ReactiveEffect, fn: Function, args: any[]): any {
     }
   }
 }
-
+// TODO:在所有依赖的对象的响应函数中删除该函数
 function cleanup(effect: ReactiveEffect) {
   const { deps } = effect
   if (deps.length) {

@@ -10,16 +10,33 @@
   <script src="./packages/vue/dist/vue.global.js"></script>
   <script>
     const { reactive, effect } = Vue;
-    const obj = {
-      a: 1
-    }
-    // const reativeObj = reactive(obj);
-    // console.log(reativeObj.a);
+    let dummy
+    var test = new Set([NaN])
+    const reativeObj = reactive(test);
     effect(() => {
-      console.log(123);
-    }, {
-      lazy: false,
+      console.log(111);
+      return dummy = test;
     })
+    
+    reativeObj.a = NaN;
+    // console.log(reativeObj)
+    // function isNaN(value, oldValue) {
+    //   return value === value || oldValue === oldValue
+    // }
+    // const obj = {
+    //   a: NaN,
+    // }
+    // const proxy = new Proxy(obj, {
+    //   set(target, key, value, receiver) {
+    //     const oldValue = target[ key ];
+    //     Reflect.set(target, key, value, receiver);
+    //     if (value !== oldValue && isNaN(value, oldValue)) {
+    //       console.log(111);
+    //     }
+    //     return true;
+    //   }
+    // });
+    // proxy.a = 'NaN';
   </script>
 </body>
 </html>

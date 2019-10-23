@@ -135,6 +135,7 @@ function createReactiveObject(
   if (!targetMap.has(target)) {
     targetMap.set(target, new Map())
   }
+  // 返回监听的proxy对象
   return observed
 }
 
