@@ -1,6 +1,4 @@
 # vue-description
-vue学习笔记
-## vue2.6  
 ## 核心类  
 ### 观察者
 目录：/src/core/observer/  
@@ -29,5 +27,3 @@ doing...
 
 doing...  
 + entry-runtime-with-compiler.js  
-
-## vue-next
