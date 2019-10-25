@@ -11,7 +11,7 @@ import { updateListeners } from '../vdom/helpers/index'
 
 // 
 /*
-  父组件会往子组件的_events对象下挂载hook函数
+  父组件会往子组件的_events对象下挂载listener函数
   vm: {
     _events: {
       hookFn: [
@@ -65,7 +65,7 @@ export function updateComponentListeners (
   oldListeners: ?Object
 ) {
   target = vm
-  // 
+  // 更新监听
   updateListeners(listeners, oldListeners || {}, add, remove, createOnceHandler, vm)
   target = undefined
 }
@@ -91,6 +91,7 @@ export function eventsMixin (Vue: Class<Component>) {
 
   Vue.prototype.$once = function (event: string, fn: Function): Component {
     const vm: Component = this
+    // 重新封装listener函数，先卸载监听,再触发原本的函数
     function on () {
       vm.$off(event, on)
       fn.apply(vm, arguments)

@@ -5,7 +5,7 @@ import { isFalse, isTrue, isDef, isUndef, isPrimitive } from 'shared/util'
 
 // The template compiler attempts to minimize the need for normalization by
 // statically analyzing the template at compile time.
-//
+
 // For plain HTML markup, normalization can be completely skipped because the
 // generated render function is guaranteed to return Array<VNode>. There are
 // two cases where extra normalization is needed:

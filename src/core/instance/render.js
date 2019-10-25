@@ -28,9 +28,15 @@ export function initRender (vm: Component) {
   // so that we get proper render context inside it.
   // args order: tag, data, children, normalizationType, alwaysNormalize
   // internal version is used by render functions compiled from templates
+
+  // 返回包装的VNode函数，
+  // 第6个参数是指 是否归并化
+  // 若为false,即简单渲染子节点（若子节点中含有子节点，则将其扁平化 ->  $children: [ VueComponent1{ $children: [VueComponent2] }] -> $children: [ VueComponent1, VueComponent2 ] ）
+  // 优点即：对于数据筛选快，即梯度变低
   vm._c = (a, b, c, d) => createElement(vm, a, b, c, d, false)
   // normalization is always applied for the public version, used in
   // user-written render functions.
+  // $createElement则是属于HTML结构标准化, 主要用于实际的dom生成
   vm.$createElement = (a, b, c, d) => createElement(vm, a, b, c, d, true)
 
   // $attrs & $listeners are exposed for easier HOC creation.
@@ -39,9 +45,11 @@ export function initRender (vm: Component) {
 
   /* istanbul ignore else */
   if (process.env.NODE_ENV !== 'production') {
+    // 定义$attrs，对父节点的options._parentVnode.attrs的读取
     defineReactive(vm, '$attrs', parentData && parentData.attrs || emptyObject, () => {   // 非深度观测
       !isUpdatingChildComponent && warn(`$attrs is readonly.`, vm)
     }, true)
+    // 定义$listeners，对父节点的options._parentListeners的读取
     defineReactive(vm, '$listeners', options._parentListeners || emptyObject, () => { // 非深度观测
       !isUpdatingChildComponent && warn(`$listeners is readonly.`, vm)
     }, true)

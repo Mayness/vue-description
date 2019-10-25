@@ -58,7 +58,7 @@ export function initLifecycle (vm: Component) {
 }
 
 export function lifecycleMixin (Vue: Class<Component>) {
-  
+
   Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
     const vm: Component = this
     const prevEl = vm.$el
@@ -349,6 +349,7 @@ export function callHook (vm: Component, hook: string) {
       invokeWithErrorHandling(handlers[i], vm, null, vm, info)
     }
   }
+  // 可以通过组件上挂载 @hook:mounted="hookFn" 等生命周期函数来触发该方法
   if (vm._hasHookEvent) {
     vm.$emit('hook:' + hook)
   }
