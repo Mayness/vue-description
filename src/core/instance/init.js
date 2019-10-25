@@ -19,7 +19,7 @@ export function initMixin (Vue: Class<Component>) {
     vm._uid = uid++
 
     let startTag, endTag
-    /* istanbul ignore if */
+    // 性能测试用
     if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
       startTag = `vue-perf-start:${vm._uid}`
       endTag = `vue-perf-end:${vm._uid}`
@@ -27,6 +27,7 @@ export function initMixin (Vue: Class<Component>) {
     }
 
     // a flag to avoid this being observed
+    // 声明是个vue内部的一个实例，可以避免被watcher类监听
     vm._isVue = true
     // merge options
     if (options && options._isComponent) {
@@ -35,6 +36,7 @@ export function initMixin (Vue: Class<Component>) {
       // internal component options needs special treatment.
       initInternalComponent(vm, options)
     } else {
+      // 合并父类和子类的option。 子类的创建 -> Vue.extends -> 单文件中的应用：components: { xxx }
       vm.$options = mergeOptions(
         resolveConstructorOptions(vm.constructor),
         options || {},
@@ -42,15 +44,17 @@ export function initMixin (Vue: Class<Component>) {
       )
     }
     /* istanbul ignore else */
+    // 最终结果都是把vm._renderProxy属性指向vm，主要是保留
     if (process.env.NODE_ENV !== 'production') {
+      // 主要是对内部属性访问的限制等
       initProxy(vm)
     } else {
       vm._renderProxy = vm
     }
     // expose real self
     vm._self = vm
-    initLifecycle(vm)
-    initEvents(vm)
+    initLifecycle(vm) // 在vm实例上挂载基本的属性
+    initEvents(vm)  // 初始化_events事件对象
     initRender(vm)
     callHook(vm, 'beforeCreate')
     initInjections(vm) // resolve injections before data/props  因为inject是在父组件上拿值，所以需要先provide初始化
@@ -92,6 +96,7 @@ export function initInternalComponent (vm: Component, options: InternalComponent
 
 export function resolveConstructorOptions (Ctor: Class<Component>) {
   let options = Ctor.options
+  // 是否有父类
   if (Ctor.super) {
     const superOptions = resolveConstructorOptions(Ctor.super)
     const cachedSuperOptions = Ctor.superOptions

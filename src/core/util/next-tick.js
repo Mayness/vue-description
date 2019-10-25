@@ -113,12 +113,15 @@ export function nextTick (cb?: Function, ctx?: Object) {  // ctx指定当前环�
       _resolve(ctx)
     }
   })
+  // 会等待下次的的next-tick再执行
   if (!pending) { // 节流
     pending = true
-    /* 此刻再执行队列中函数
+    /* 
+      此刻再执行队列中函数
         假设执行函数是Promise，简化模式：
-        timerFun = () => {
+        timerFunc = () => {
           Promise.resolve().then(() => {
+            pending = false
             callbacks.forEach(cb => cb())
           })
         }

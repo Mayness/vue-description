@@ -34,19 +34,21 @@ export function initLifecycle (vm: Component) {
 
   // locate first non-abstract parent
   let parent = options.parent
+  // 是否为抽象组件，例如keep-alive、transition，没有任何DOM元素，仅添加功能。
   if (parent && !options.abstract) {
     while (parent.$options.abstract && parent.$parent) {
       parent = parent.$parent
     }
+    // 抽象函数不进行挂载
     parent.$children.push(vm)
   }
-
+  // 寻找父节点和根节点
   vm.$parent = parent
   vm.$root = parent ? parent.$root : vm
-
+  // 挂载基本的属性
   vm.$children = []
   vm.$refs = {}
-
+  
   vm._watcher = null
   vm._inactive = null
   vm._directInactive = false
@@ -56,6 +58,7 @@ export function initLifecycle (vm: Component) {
 }
 
 export function lifecycleMixin (Vue: Class<Component>) {
+  
   Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
     const vm: Component = this
     const prevEl = vm.$el

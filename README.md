@@ -4,22 +4,22 @@
 目录：/src/core/observer/  
 
 done  
-+ observer.js  
-+ scheduler.js  更新队列  
-+ watcher.js  
-+ dep.js  
++ [观察者核心](/src/core/observer/index.js)（结合data和dep依赖）
++ [更新队列](/src/core/observer/scheduler.js)
++ [watcher](/src/core/observer/watcher.js)
++ [依赖dep](/src/core/observer/dep.js) 
 
 ### 工具类  
 目录：/src/core/util/  
 
 done
-+ next-tick.js  
++ [next-tick任务执行队列](/src/core/util/next-tick.js)  
 
 ### 初始化
 目录：/src/core/instance/  
 
 doing...  
-+ init.js  
++ [initMixin](/src/core/instance/init.js  )
 + state.js  props、methods、data、watch的初始化  
 
 ### 编译器

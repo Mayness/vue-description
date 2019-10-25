@@ -9,11 +9,31 @@ import {
 } from '../util/index'
 import { updateListeners } from '../vdom/helpers/index'
 
+// 
+/*
+  父组件会往子组件的_events对象下挂载hook函数
+  vm: {
+    _events: {
+      hookFn: [
+        () => {
+
+        }
+      ]
+    }
+  }
+*/
 export function initEvents (vm: Component) {
   vm._events = Object.create(null)
   vm._hasHookEvent = false
   // init parent attached events
+  // 从vm.$options._parentListeners上取得hook函数
+  /*
+    father
+    <child emitFn="emitFn"/>
+    child的vm.$options._parentListeners就会挂载内部封装的emitFn函数
+  */
   const listeners = vm.$options._parentListeners
+  // 如果父节点有hook函数，则将hook函数挂载到
   if (listeners) {
     updateComponentListeners(vm, listeners)
   }
@@ -38,13 +58,14 @@ function createOnceHandler (event, fn) {
     }
   }
 }
-
+// vue
 export function updateComponentListeners (
   vm: Component,
   listeners: Object,
   oldListeners: ?Object
 ) {
   target = vm
+  // 
   updateListeners(listeners, oldListeners || {}, add, remove, createOnceHandler, vm)
   target = undefined
 }
@@ -115,6 +136,7 @@ export function eventsMixin (Vue: Class<Component>) {
     return vm
   }
 
+  // 触发当前_event对象下父组件挂载的事件
   Vue.prototype.$emit = function (event: string): Component {
     const vm: Component = this
     if (process.env.NODE_ENV !== 'production') {
