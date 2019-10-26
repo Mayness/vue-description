@@ -19,7 +19,7 @@ done
 目录：/src/core/instance/  
 
 doing...  
-+ [initMixin](/src/core/instance/init.js  )
++ [initMixin](/src/core/instance/init.js)
 + state.js  props、methods、data、watch的初始化  
 
 ### 编译器

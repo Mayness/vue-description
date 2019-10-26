@@ -56,9 +56,9 @@ export function initMixin (Vue: Class<Component>) {
     initLifecycle(vm) // 在vm实例上挂载基本的属性
     initEvents(vm)  // 初始化_events事件对象
     initRender(vm)  // 主要是挂载VNode的包装函数
-    callHook(vm, 'beforeCreate')
+    callHook(vm, 'beforeCreate')  // 至此beforeCreate钩子触发，之前主要是主要的数据合并挂载
     initInjections(vm) // resolve injections before data/props  因为inject是在父组件上拿值，所以需要先provide初始化
-    initState(vm)
+    initState(vm) // TODO:
     initProvide(vm) // resolve provide after data/props
     callHook(vm, 'created')
 
