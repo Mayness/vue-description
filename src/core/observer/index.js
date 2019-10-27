@@ -114,7 +114,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
   let ob: Observer | void
   if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
     ob = value.__ob__
-  } else if ( // 1,需要开启观测 2，非服务端渲染 3，需要时数组或一般对象 4，可扩展的对象 5，需要时vue上的数据
+  } else if ( // 1,需要开启观测 2，非服务端渲染 3，需要是数组或一般对象 4，可扩展的对象 5，需要是vue上的数据
     shouldObserve &&
     !isServerRendering() &&
     (Array.isArray(value) || isPlainObject(value)) &&
