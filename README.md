@@ -9,6 +9,8 @@ done
 + [watcher](/src/core/observer/watcher.js)
 + [依赖dep](/src/core/observer/dep.js) 
 
+### 虚拟dom
+
 ### 工具类  
 目录：/src/core/util/  
 

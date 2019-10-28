@@ -26,6 +26,7 @@ import {
  * how to merge a parent option value and a child option
  * value into the final value.
  */
+// 选择合并策略
 const strats = config.optionMergeStrategies
 
 /**
@@ -123,6 +124,7 @@ strats.data = function (
   childVal: any,
   vm?: Component
 ): ?Function {
+  // 如果不是函数，则会抛出warn
   if (!vm) {
     if (childVal && typeof childVal !== 'function') {
       process.env.NODE_ENV !== 'production' && warn(

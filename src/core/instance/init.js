@@ -15,11 +15,11 @@ let uid = 0
 export function initMixin (Vue: Class<Component>) {
   Vue.prototype._init = function (options?: Object) {
     const vm: Component = this
-    // a uid
+    // uid从渲染的父级到子级 依次递增
     vm._uid = uid++
 
     let startTag, endTag
-    // 性能测试用
+    // 性能测试用，可以通过uid来确定是哪个渲染组件
     if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
       startTag = `vue-perf-start:${vm._uid}`
       endTag = `vue-perf-end:${vm._uid}`
@@ -58,9 +58,17 @@ export function initMixin (Vue: Class<Component>) {
     initRender(vm)  // 主要是挂载VNode的包装函数
     callHook(vm, 'beforeCreate')  // 至此beforeCreate钩子触发，之前主要是主要的数据合并挂载
     initInjections(vm) // resolve injections before data/props  因为inject是在父组件上拿值，所以需要先provide初始化
-    initState(vm) // TODO:
-    initProvide(vm) // resolve provide after data/props
-    callHook(vm, 'created')
+    /*
+      初始化props、methods、data、computed、watch声明的值
+      props -> vm._props[ key ]
+      methods -> vm[ key ]
+      data -> vm._data[ key ]
+      computed -> vm._computedWatchers[ key ]
+      watcher暂时没有发现挂载
+    */
+    initState(vm)
+    initProvide(vm) // resolve provide after data/props 定义provide属性，执行挂载
+    callHook(vm, 'created') // 初始化响应式数据，这里就已经可以监听数据了
 
     /* istanbul ignore if */
     if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
@@ -68,7 +76,7 @@ export function initMixin (Vue: Class<Component>) {
       mark(endTag)
       measure(`vue ${vm._name} init`, startTag, endTag)
     }
-
+    // 挂载dom
     if (vm.$options.el) {
       vm.$mount(vm.$options.el)
     }

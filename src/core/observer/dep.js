@@ -19,7 +19,7 @@ export default class Dep {
     this.id = uid++
     this.subs = []
   }
-
+  
   addSub (sub: Watcher) {
     this.subs.push(sub)
   }

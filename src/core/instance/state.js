@@ -48,15 +48,17 @@ export function proxy (target: Object, sourceKey: string, key: string) {
 export function initState (vm: Component) {
   vm._watchers = []
   const opts = vm.$options
-  if (opts.props) initProps(vm, opts.props) // 初始化props
-  if (opts.methods) initMethods(vm, opts.methods) // 初始化methods
+  if (opts.props) initProps(vm, opts.props) // 初始化props，主要是限制props数据中的可写性
+  if (opts.methods) initMethods(vm, opts.methods) // 初始化methods，内部定义的必须是函数，并且防止和props重名和限制命名规则
+  
   if (opts.data) {
-    initData(vm)
+    initData(vm) // 检测data中的数据，需要时函数或对象，并且内部对象的key值不能与以上定义属性重名。并挂载_data属性。将对象转换为observer类
   } else {
-    // 直接通过observe进行观测
+    // 没有data的话，将data视为空对象
     observe(vm._data = {}, true /* asRootData */)
   }
-  if (opts.computed) initComputed(vm, opts.computed)
+  if (opts.computed) initComputed(vm, opts.computed)  
+  // watch不能是浏览Object.prototype.watch的原生对象，目前只有FireFox实现
   if (opts.watch && opts.watch !== nativeWatch) {
     initWatch(vm, opts.watch)
   }
@@ -67,9 +69,9 @@ function initProps (vm: Component, propsOptions: Object) {
   const props = vm._props = {}
   // cache prop keys so that future props updates can iterate using Array
   // instead of dynamic object key enumeration.
-  const keys = vm.$options._propKeys = []
+  const keys = vm.$options._propKeys = [] // 缓存对象的键，方便后面可以筛选枚举。而不是后面再来循环对象。
   const isRoot = !vm.$parent  // 如果$parent属性没有值，则代表是个根组件
-  // root instance props should be converted
+  // root instance props should be converted  
   if (!isRoot) {
     toggleObserving(false)  // 如果不是根组件则关闭观测，即将shouldObserve置为false
   }
@@ -80,7 +82,7 @@ function initProps (vm: Component, propsOptions: Object) {
     if (process.env.NODE_ENV !== 'production') {
       const hyphenatedKey = hyphenate(key)  // 将有驼峰的键名转为横线
       if (isReservedAttribute(hyphenatedKey) || // 是否为保留字符名
-          config.isReservedAttr(hyphenatedKey)) { // 有效字符串名，这里讲prop中的键转化成布尔值
+          config.isReservedAttr(hyphenatedKey)) { // 有效字符串名，这里将prop中的键转化成布尔值
         warn(
           `"${hyphenatedKey}" is a reserved attribute and cannot be used as component prop.`,
           vm
@@ -171,6 +173,7 @@ function initComputed (vm: Component, computed: Object) {
   // $flow-disable-line
   const watchers = vm._computedWatchers = Object.create(null)
   // computed properties are just getters during SSR
+  // commputed属性在SSR中只提供getters方法
   const isSSR = isServerRendering()
 
   for (const key in computed) {
@@ -182,8 +185,8 @@ function initComputed (vm: Component, computed: Object) {
         vm
       )
     }
-
-    if (!isSSR) {
+    // 如果不是ssr则进行观测
+    if (!isSSR) 
       // create internal watcher for the computed property.
       watchers[key] = new Watcher(
         vm,
@@ -305,6 +308,7 @@ function initMethods (vm: Component, methods: Object) {
         )
       }
     }
+    // 方法直接挂载到实例上
     vm[key] = typeof methods[key] !== 'function' ? noop : bind(methods[key], vm)
   }
 }
@@ -340,12 +344,23 @@ function createWatcher (
   handler: any,
   options?: Object
 ) {
+  // 若watch handler是个对象，则读取其中的handler
+  /*
+    watch: {
+      foo: {
+        handler() {
+
+        },
+        deep: true,
+      }
+    }
+  */
   if (isPlainObject(handler)) {
     options = handler
     handler = handler.handler
   }
   if (typeof handler === 'string') {
-    handler = vm[handler]
+    handler = vm[handler]   // 指向vm实例中的method方法，因此字符串指向method函数
   }
   return vm.$watch(expOrFn, handler, options)
 }

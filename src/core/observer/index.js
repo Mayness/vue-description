@@ -113,6 +113,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
   }
   let ob: Observer | void
   if (hasOwn(value, '__ob__') && value.__ob__ instanceof Observer) {
+    // 查看是否已经是observer，则直接返回
     ob = value.__ob__
   } else if ( // 1,需要开启观测 2，非服务端渲染 3，需要是数组或一般对象 4，可扩展的对象 5，需要是vue上的数据
     shouldObserve &&
@@ -121,7 +122,7 @@ export function observe (value: any, asRootData: ?boolean): Observer | void {
     Object.isExtensible(value) &&
     !value._isVue
   ) {
-    ob = new Observer(value)
+    ob = new Observer(value)  // 在这里面会将observer 放入 ob.__ob__
   }
   if (asRootData && ob) {
     ob.vmCount++
