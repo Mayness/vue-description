@@ -65,9 +65,11 @@ export function isRegExp (v: any): boolean {
 
 /**
  * Check if val is a valid array index.
+ * 如果是数组小标的话 检查是否是个有效的值
  */
 export function isValidArrayIndex (val: any): boolean {
   const n = parseFloat(String(val))
+  // isFinite判断是否是个有限值，其中不是有限制的包括： 例:10/3、Infinity、-Infinity、NaN
   return n >= 0 && Math.floor(n) === n && isFinite(val)
 }
 

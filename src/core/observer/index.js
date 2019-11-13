@@ -204,12 +204,12 @@ export function defineReactive (
  */
 export function set (target: Array<any> | Object, key: any, val: any): any {
   if (process.env.NODE_ENV !== 'production' &&
-    (isUndef(target) || isPrimitive(target))  // 判断是undefined、null、原始类型
+    (isUndef(target) || isPrimitive(target))  // 判断是undefined、null、原始类型，只能给对象设置set key
   ) {
     warn(`Cannot set reactive property on undefined, null, or primitive value: ${(target: any)}`)
   }
-  if (Array.isArray(target) && isValidArrayIndex(key)) {  // 对数组的判断，判断是否是有效 下标
-    // 这里为了防止key大于数组下标后，val仅添加到最后一个。因此需要先设置长度，再通过splice改变数组。
+  if (Array.isArray(target) && isValidArrayIndex(key)) {  // 对数组的判断，判断是否是有效 key
+    // 这里为了防止key大于数组下标后，val仅添加到最后一个。因此需要先设置确定好数组的长度，再通过splice改变数组。
     /* TEST:
         const a = [ 1, 2, 3 ];
         a.splice(5, 1, 'res');  // [ 1, 2, 3, 'res' ]
@@ -240,7 +240,8 @@ export function set (target: Array<any> | Object, key: any, val: any): any {
       }
     })
   */
-  if (key in target && !(key in Object.prototype)) {  // https://github.com/vuejs/vue/issues/6845
+ // key存在target的原型链上，并且key不能属于Object.prototype上的key -> 因此如果定义在原型链上，会将key值重新定义在对象属性上
+  if (key in target && !(key in Object.prototype)) {  // https://github.com/vuejs/vue/issues/6845，
     target[key] = val // 直接设置值并且返回即可，无需再进行观测
     return val
   }

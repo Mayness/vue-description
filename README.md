@@ -9,6 +9,9 @@ done
 + [watcher](/src/core/observer/watcher.js)
 + [依赖dep](/src/core/observer/dep.js) 
 
+doing...
++ [runtime](/src/platforms/web/runtime/index.js)
+
 ### 虚拟dom
 
 ### 工具类  

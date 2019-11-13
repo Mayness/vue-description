@@ -74,10 +74,12 @@ export function initMixin (Vue: Class<Component>) {
     if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
       vm._name = formatComponentName(vm, false)
       mark(endTag)
-      measure(`vue ${vm._name} init`, startTag, endTag)
+      measure(`vue ${vm._name} init`, 
+      startTag, endTag)
     }
-    // 挂载dom
+    // 挂载解析dom
     if (vm.$options.el) {
+      // TODO:
       vm.$mount(vm.$options.el)
     }
   }

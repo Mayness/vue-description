@@ -369,11 +369,19 @@ export function stateMixin (Vue: Class<Component>) {
   // flow somehow has problems with directly declared definition object
   // when using Object.defineProperty, so we have to procedurally build up
   // the object here.
+  /* 
+    在Object中直接用Object.defineProperty来声明定义数据流的时候，可能会发生错误，
+    因此我们必须手动的来创建它
+  */
+  // 指明 data 和 prop 的 defineProperty handler 拦截对象，内部主要包括get和set
   const dataDef = {}
+  // dataDef 的 get函数 指向 this._data
   dataDef.get = function () { return this._data }
   const propsDef = {}
+  // propsDef 的 get函数 指向 this._props
   propsDef.get = function () { return this._props }
   if (process.env.NODE_ENV !== 'production') {
+    // 不能对 dataDef 进行直接赋值，避免对象被替换
     dataDef.set = function () {
       warn(
         'Avoid replacing instance root $data. ' +
@@ -381,6 +389,7 @@ export function stateMixin (Vue: Class<Component>) {
         this
       )
     }
+    // propsDef 也不能触发set，因为是只读对象
     propsDef.set = function () {
       warn(`$props is readonly.`, this)
     }
@@ -388,7 +397,7 @@ export function stateMixin (Vue: Class<Component>) {
   Object.defineProperty(Vue.prototype, '$data', dataDef)
   Object.defineProperty(Vue.prototype, '$props', propsDef)
 
-  // 挂载$set、$delete方法
+  // 挂载$set、$delete方法。主要是因为不能实现在对象中新增加一个键值对和删除一个键值对的操作。若需要操作需要调用$set或$delete方法
   Vue.prototype.$set = set
   Vue.prototype.$delete = del
 

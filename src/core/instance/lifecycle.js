@@ -21,6 +21,7 @@ import {
 export let activeInstance: any = null
 export let isUpdatingChildComponent: boolean = false
 
+// dom实例更新：old过渡到new，中间需要经过patch操作
 export function setActiveInstance(vm: Component) {
   const prevActiveInstance = activeInstance
   activeInstance = vm
@@ -58,20 +59,25 @@ export function initLifecycle (vm: Component) {
 }
 
 export function lifecycleMixin (Vue: Class<Component>) {
-
+  // 更新函数
   Vue.prototype._update = function (vnode: VNode, hydrating?: boolean) {
     const vm: Component = this
+    // 保存el挂载元素
     const prevEl = vm.$el
+    // 保存当前为改变的虚拟dom
     const prevVnode = vm._vnode
     const restoreActiveInstance = setActiveInstance(vm)
+    // vnode为现有新赋值的vnode
     vm._vnode = vnode
     // Vue.prototype.__patch__ is injected in entry points
     // based on the rendering backend used.
+    // 如果没有旧的Vnode，则直接渲染
     if (!prevVnode) {
       // initial render
       vm.$el = vm.__patch__(vm.$el, vnode, hydrating, false /* removeOnly */)
     } else {
       // updates
+      // 如果有，则为prevVnode打patch，更新dom
       vm.$el = vm.__patch__(prevVnode, vnode)
     }
     restoreActiveInstance()
@@ -90,6 +96,7 @@ export function lifecycleMixin (Vue: Class<Component>) {
     // updated in a parent's updated hook.
   }
 
+  // 强制触发订阅事件的函数
   Vue.prototype.$forceUpdate = function () {
     const vm: Component = this
     if (vm._watcher) {
@@ -97,6 +104,7 @@ export function lifecycleMixin (Vue: Class<Component>) {
     }
   }
 
+  // 移除函数
   Vue.prototype.$destroy = function () {
     const vm: Component = this
     if (vm._isBeingDestroyed) {
