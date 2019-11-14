@@ -79,7 +79,7 @@ export function initMixin (Vue: Class<Component>) {
     }
     // 挂载解析dom
     if (vm.$options.el) {
-      // TODO:
+      // web：vue/src/platforms/web/runtime/index.js
       vm.$mount(vm.$options.el)
     }
   }

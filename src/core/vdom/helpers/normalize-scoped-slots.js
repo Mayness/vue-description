@@ -33,6 +33,13 @@ export function normalizeScopedSlots (
     res = {}
     for (const key in slots) {
       if (slots[key] && key[0] !== '$') {
+        // 存储方式
+        /*
+            $slots: {
+              default: [ VNode ],
+              [ slotName ]: [ VNode, VNode ],
+            }
+        */
         res[key] = normalizeScopedSlot(normalSlots, key, slots[key])
       }
     }

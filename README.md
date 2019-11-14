@@ -9,10 +9,11 @@ done
 + [watcher](/src/core/observer/watcher.js)
 + [依赖dep](/src/core/observer/dep.js) 
 
-doing...
-+ [runtime](/src/platforms/web/runtime/index.js)
-
 ### 虚拟dom
+doing...
++ [render](/src/core/vdom/create-element.js)  
++ [update]()
+
 
 ### 工具类  
 目录：/src/core/util/  
@@ -23,12 +24,11 @@ done
 ### 初始化
 目录：/src/core/instance/  
 
-doing...  
+done  
 + [initMixin](/src/core/instance/init.js)
-+ state.js  props、methods、data、watch的初始化  
 
-### 编译器
+### 编译: web
 目录：/src/platforms/web/  
 
-doing...  
-+ entry-runtime-with-compiler.js  
+doing...
++ [runtime](/src/platforms/web/runtime/index.js)

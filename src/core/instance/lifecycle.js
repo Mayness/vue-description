@@ -178,8 +178,10 @@ export function mountComponent (
       }
     }
   }
+  // beforeMount：渲染出虚拟dom
   callHook(vm, 'beforeMount')
 
+  // 封装_update方法
   let updateComponent
   /* istanbul ignore if */
   if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
@@ -205,6 +207,7 @@ export function mountComponent (
     }
   }
 
+  // 挂载VNode update函数 注册到 watcher 中
   // we set this to vm._watcher inside the watcher's constructor
   // since the watcher's initial patch may call $forceUpdate (e.g. inside child
   // component's mounted hook), which relies on vm._watcher being already defined

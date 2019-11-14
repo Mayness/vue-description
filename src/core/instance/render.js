@@ -36,7 +36,7 @@ export function initRender (vm: Component) {
   vm._c = (a, b, c, d) => createElement(vm, a, b, c, d, false)
   // normalization is always applied for the public version, used in
   // user-written render functions.
-  // $createElement则是属于HTML结构标准化, 主要用于实际的dom生成
+  // $createElement则是属于HTML结构标准化, 主要用于实际的dom生成，在用户填写的option的render中 h -> h(dom)中的h就是vm.$createElement函数
   vm.$createElement = (a, b, c, d) => createElement(vm, a, b, c, d, true)
 
   // $attrs & $listeners are exposed for easier HOC creation.
@@ -68,16 +68,20 @@ export function setCurrentRenderingInstance (vm: Component) {
 
 export function renderMixin (Vue: Class<Component>) {
   // install runtime convenience helpers
+  // 为Vue原型挂载工具函数
   installRenderHelpers(Vue.prototype)
 
+  // $nextTick异步执行函数
   Vue.prototype.$nextTick = function (fn: Function) {
     return nextTick(fn, this)
   }
 
+  // 生成虚拟dom函数
   Vue.prototype._render = function (): VNode {
     const vm: Component = this
     const { render, _parentVnode } = vm.$options
 
+    // 如果有父级元素，则有可能存在父级元素挂载的slot元素，若存在，则把slot元素的key和vnode挂载到$scopedSlots下
     if (_parentVnode) {
       vm.$scopedSlots = normalizeScopedSlots(
         _parentVnode.data.scopedSlots,
@@ -96,6 +100,8 @@ export function renderMixin (Vue: Class<Component>) {
       // separately from one another. Nested component's render fns are called
       // when parent component is patched.
       currentRenderingInstance = vm
+      // vm._renderProxy: src/core/instance/init.js proxy代理之后的vm
+      // vm.$createElement: 当前页面的initRender方法   渲染成虚拟dom的函数
       vnode = render.call(vm._renderProxy, vm.$createElement)
     } catch (e) {
       handleError(e, vm, `render`)
