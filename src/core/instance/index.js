@@ -16,8 +16,8 @@ function Vue (options) {
 }
 
 initMixin(Vue)    // beforeCreate、created处理的任务，主要是初始化数据，事件
-stateMixin(Vue)   // 挂载数据检测、检测函数$set、$delete、$watch
-eventsMixin(Vue)  // 挂载订阅事件的方法 $on
+stateMixin(Vue)   // 挂载数据检测$data、$props、检测函数$set、$delete、$watch
+eventsMixin(Vue)  // 挂载订阅事件的方法 $on、$once、$off
 lifecycleMixin(Vue) // 挂载更新$update、$forceUpdate、$destroy函数
 renderMixin(Vue)  // 挂载工具函数、$nextTick、_render生成虚拟dom函数
 

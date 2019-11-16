@@ -12,7 +12,8 @@ done
 ### 虚拟dom
 doing...
 + [render](/src/core/vdom/create-element.js)  
-+ [update]()
++ [update](/src/core/instance/lifecycle.js#_update)
++ [patch](/src/platforms/web/runtime/patch.js)
 
 
 ### 工具类  
