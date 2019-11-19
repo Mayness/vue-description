@@ -17,6 +17,7 @@ import {
   validateProp
 } from '../util/index'
 
+// 创建一个渲染函数
 export function FunctionalRenderContext (
   data: VNodeData,
   props: Object,
@@ -27,6 +28,7 @@ export function FunctionalRenderContext (
   const options = Ctor.options
   // ensure the createElement function in functional components
   // gets a unique context - this is necessary for correct named slot check
+  // 确保createElement在渲染函数上有唯一的上下文 - 因为这需要对命名槽进行检查
   let contextVm
   if (hasOwn(parent, '_uid')) {
     contextVm = Object.create(parent)
@@ -40,6 +42,7 @@ export function FunctionalRenderContext (
     // $flow-disable-line
     parent = parent._original
   }
+
   const isCompiled = isTrue(options._compiled)
   const needNormalization = !isCompiled
 
@@ -76,6 +79,7 @@ export function FunctionalRenderContext (
   }
 
   if (options._scopeId) {
+    // 此处定义渲染函数的引用
     this._c = (a, b, c, d) => {
       const vnode = createElement(contextVm, a, b, c, d, needNormalization)
       if (vnode && !Array.isArray(vnode)) {
@@ -90,7 +94,7 @@ export function FunctionalRenderContext (
 }
 
 installRenderHelpers(FunctionalRenderContext.prototype)
-
+// 创建渲染函数
 export function createFunctionalComponent (
   Ctor: Class<Component>,
   propsData: ?Object,
@@ -103,6 +107,7 @@ export function createFunctionalComponent (
   const propOptions = options.props
   if (isDef(propOptions)) {
     for (const key in propOptions) {
+      // 拉取props对应的key的值
       props[key] = validateProp(key, propOptions, propsData || emptyObject)
     }
   } else {
@@ -110,6 +115,7 @@ export function createFunctionalComponent (
     if (isDef(data.props)) mergeProps(props, data.props)
   }
 
+  // 创建渲染函数
   const renderContext = new FunctionalRenderContext(
     data,
     props,

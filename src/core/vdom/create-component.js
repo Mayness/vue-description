@@ -148,17 +148,21 @@ export function createComponent (
 
   // resolve constructor options in case global mixins are applied after
   // component constructor creation
+  // 在component构造函数创建后，需要用 global mixins 完成构造函数的option的合并操作
   resolveConstructorOptions(Ctor)
 
   // transform component v-model data into props & events
+  // 将 component 中的 v-model 数据 转化为 props和events 数据，即实现形成数据绑定
   if (isDef(data.model)) {
     transformModel(Ctor.options, data)
   }
 
   // extract props
+  // 提取props的值，并且校验转换prop命名
   const propsData = extractPropsFromVNodeData(data, Ctor, tag)
 
   // functional component
+  // 创建 渲染函数
   if (isTrue(Ctor.options.functional)) {
     return createFunctionalComponent(Ctor, propsData, data, context, children)
   }
@@ -247,9 +251,10 @@ function mergeHook (f1: any, f2: any): Function {
 
 // transform component v-model info (value and callback) into
 // prop and event handler respectively.
+// 当 component 传入 v-model 数据时，在component组件中可以用props中的value拿到数据，并且可以用事件event回调做通知数据改变
 function transformModel (options, data: any) {
-  const prop = (options.model && options.model.prop) || 'value'
-  const event = (options.model && options.model.event) || 'input'
+  const prop = (options.model && options.model.prop) || 'value' // 默认是value属性
+  const event = (options.model && options.model.event) || 'input' // 默认监听input事件
   ;(data.attrs || (data.attrs = {}))[prop] = data.model.value
   const on = data.on || (data.on = {})
   const existing = on[event]

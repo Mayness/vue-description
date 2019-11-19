@@ -12,6 +12,7 @@ done
 ### 虚拟dom
 doing...
 + [render](/src/core/vdom/create-element.js)  
++ [createComponent](/src/core/vdom/create-component.js)  
 + [update](/src/core/instance/lifecycle.js#_update)
 + [patch](/src/platforms/web/runtime/patch.js)
 

@@ -18,6 +18,7 @@ type PropOptions = {
   validator: ?Function
 };
 
+// 拉取prop的值
 export function validateProp (
   key: string,  // 键名
   propOptions: Object,  //  定义的整个prop option，内部可能包含键的类型、默认值等等

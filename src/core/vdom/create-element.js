@@ -118,7 +118,7 @@ export function _createElement (
     } else if ((!data || !data.pre) && isDef(Ctor = resolveAsset(context.$options, 'components', tag))) {
       // 如果不是保留标签，那么将尝试从vm的components原型链上查找是否有这个标签的定义
       // component
-      // resolveAsset 解析components
+      // 将数据渲染为 渲染函数
       vnode = createComponent(Ctor, data, context, children, tag)
     } else {
       // 

@@ -31,7 +31,7 @@ import {
 export const emptyNode = new VNode('', {}, [])
 
 const hooks = ['create', 'activate', 'update', 'remove', 'destroy']
-
+// 判断是否为同一元素：key、tagName、注释、属性
 function sameVnode (a, b) {
   return (
     a.key === b.key && (
@@ -73,6 +73,8 @@ export function createPatchFunction (backend) {
 
   const { modules, nodeOps } = backend
 
+  // 初始化声明周期函数的hooks
+  /* 帮助函数 start */
   for (i = 0; i < hooks.length; ++i) {
     cbs[hooks[i]] = []
     for (j = 0; j < modules.length; ++j) {
@@ -119,6 +121,7 @@ export function createPatchFunction (backend) {
       config.isUnknownElement(vnode.tag)
     )
   }
+  /* 帮助函数 end */
 
   let creatingElmInVPre = 0
 
@@ -344,14 +347,17 @@ export function createPatchFunction (backend) {
     }
   }
 
+  // 触发组件中的destroy函数
   function invokeDestroyHook (vnode) {
     let i, j
     const data = vnode.data
     if (isDef(data)) {
+      // 触发组件中销毁hook
       if (isDef(i = data.hook) && isDef(i = i.destroy)) i(vnode)
       for (i = 0; i < cbs.destroy.length; ++i) cbs.destroy[i](vnode)
     }
     if (isDef(i = vnode.children)) {
+      // 如果子组件有destroy函数，则递归触发
       for (j = 0; j < vnode.children.length; ++j) {
         invokeDestroyHook(vnode.children[j])
       }
@@ -506,15 +512,16 @@ export function createPatchFunction (backend) {
     index,
     removeOnly
   ) {
+    // 是否为同一个vnode元素
     if (oldVnode === vnode) {
       return
     }
-
+    
     if (isDef(vnode.elm) && isDef(ownerArray)) {
       // clone reused vnode
       vnode = ownerArray[index] = cloneVNode(vnode)
     }
-
+    // 取出真实节点
     const elm = vnode.elm = oldVnode.elm
 
     if (isTrue(oldVnode.isAsyncPlaceholder)) {
@@ -530,6 +537,13 @@ export function createPatchFunction (backend) {
     // note we only do this if the vnode is cloned -
     // if the new node is not cloned it means the render functions have been
     // reset by the hot-reload-api and we need to do a proper re-render.
+
+    /* 
+      静态节点树在vnode中是属于多次重复使用的元素
+      代表如果这个元素如果是克隆元素，我们则不需要做任何操作
+      如果一个新的元素没有在clone表中，则需要当render函数再次执行的时候，做一些细微的重新渲染小操作.
+    */
+    // 如果是静态节点则不比较
     if (isTrue(vnode.isStatic) &&
       isTrue(oldVnode.isStatic) &&
       vnode.key === oldVnode.key &&
@@ -541,6 +555,7 @@ export function createPatchFunction (backend) {
 
     let i
     const data = vnode.data
+    // 触发生命周期函数： prepatch
     if (isDef(data) && isDef(i = data.hook) && isDef(i = i.prepatch)) {
       i(oldVnode, vnode)
     }
@@ -549,8 +564,10 @@ export function createPatchFunction (backend) {
     const ch = vnode.children
     if (isDef(data) && isPatchable(vnode)) {
       for (i = 0; i < cbs.update.length; ++i) cbs.update[i](oldVnode, vnode)
+      // 触发生命周期函数： update
       if (isDef(i = data.hook) && isDef(i = i.update)) i(oldVnode, vnode)
     }
+    // 如果没有文本节点
     if (isUndef(vnode.text)) {
       if (isDef(oldCh) && isDef(ch)) {
         if (oldCh !== ch) updateChildren(elm, oldCh, ch, insertedVnodeQueue, removeOnly)
@@ -566,9 +583,11 @@ export function createPatchFunction (backend) {
         nodeOps.setTextContent(elm, '')
       }
     } else if (oldVnode.text !== vnode.text) {
+      // 如果文本节点不一样，则进行更新
       nodeOps.setTextContent(elm, vnode.text)
     }
     if (isDef(data)) {
+      // 触发生命周期函数： postpatch
       if (isDef(i = data.hook) && isDef(i = i.postpatch)) i(oldVnode, vnode)
     }
   }
@@ -697,29 +716,36 @@ export function createPatchFunction (backend) {
     }
   }
 
+  // 1，处理的真正的patch函数
   return function patch (oldVnode, vnode, hydrating, removeOnly) {
+    // 如果新VNode不存在 且 新VNode存在，则代表是要销毁节点
     if (isUndef(vnode)) {
       if (isDef(oldVnode)) invokeDestroyHook(oldVnode)
       return
     }
 
     let isInitialPatch = false
+    // 初始化一个更新队列
     const insertedVnodeQueue = []
 
+    // 若老VNode不存在，则直接创建一个含有新VNode的新节点
     if (isUndef(oldVnode)) {
       // empty mount (likely as component), create new root element
       isInitialPatch = true
       createElm(vnode, insertedVnodeQueue)
     } else {
       const isRealElement = isDef(oldVnode.nodeType)
+      // 判断是oldVnode否为真实节点、判断oldVnode和vnode同一节点
       if (!isRealElement && sameVnode(oldVnode, vnode)) {
         // patch existing root node
+        // 如果节点一致，则进行深度patch
         patchVnode(oldVnode, vnode, insertedVnodeQueue, null, null, removeOnly)
       } else {
         if (isRealElement) {
           // mounting to a real element
           // check if this is server-rendered content and if we can perform
           // a successful hydration.
+          // 初始化1个真实节点，需要检查是否为服务端渲染的内容和是否可以渲染一个虚拟节点
           if (oldVnode.nodeType === 1 && oldVnode.hasAttribute(SSR_ATTR)) {
             oldVnode.removeAttribute(SSR_ATTR)
             hydrating = true

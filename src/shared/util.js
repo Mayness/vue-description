@@ -177,6 +177,7 @@ export const capitalize = cached((str: string): string => {
 
 /**
  * Hyphenate a camelCase string.
+ * 将驼峰写法转换为 -小写: aaBb -> aa-bb
  */
 const hyphenateRE = /\B([A-Z])/g  // 大写字母的非单词边界，即驼峰转化成横线
 export const hyphenate = cached((str: string): string => {
